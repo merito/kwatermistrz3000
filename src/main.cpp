@@ -12,6 +12,19 @@ using namespace std;
 Pietro* pietra;
 int liczbaPieter=0;
 
+int szukajNazwy(char *szukanie){
+    for(int i=0;i<liczbaPieter;i++){
+        for(int j=0;j<pietra[i].getLiczbaPokoi();j++){
+            for(int k=0;k<pietra[i].getPokoje()[j].getLiczbaMiejsc();k++){
+                if(strstr(pietra[i].getPokoje()[j].getOsobaZPokoju(k)->getOsoba(), szukanie)){
+                    return pietra[i].getPokoje()[j].getNumerPokoju();
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
 void zapiszBaze(Pietro* pietra, int liczbaPieter){
     FILE *plik;
     if((plik=fopen("rajd_elektryka.txt","wt"))!=NULL){
@@ -40,7 +53,7 @@ Pokoj* getRoomPtrByNumber(int number){
         }
     }
 
-    return -1;
+    return NULL;
 }
 
 void oknoGlowne(int liczbaPieter, Pietro* pietra){
@@ -108,7 +121,7 @@ void oknoGlowne(int liczbaPieter, Pietro* pietra){
             x=0;
         }
 
-        mvprintw(rzedy-1,0,"Dostepne komendy: zapisz, koniec (nie zapisuje danych!)");
+        mvprintw(rzedy-1,0,"Dostepne komendy: zapisz, szukaj, koniec (nie zapisuje danych!)");
         mvprintw(rzedy-2,0,"Podaj numer pokoju do edycji lub komende: ");
 
         //refresh();
@@ -120,84 +133,102 @@ void oknoGlowne(int liczbaPieter, Pietro* pietra){
         if(!(strcmp(input,"koniec"))){
             delete[] pietra;
             return;
-        }
-        wybor=atoi(input);
+        }else
+        if(!(strcmp(input,"szukaj"))){
+            char szukanie[50];
+            move(rzedy-2,0);
+            clrtobot();
+            mvprintw(rzedy-2,0,"Wpisz szukane slowo: ");
+            curs_set(1);
+            echo();
+            getstr(szukanie);
+            curs_set(0);
+            int pokoj=szukajNazwy(szukanie);
+            if(pokoj){
+                mvprintw(rzedy-1,0,"Osobe znajdziesz w pokoju %d", pokoj);
+            }else{
+                mvprintw(rzedy-1,0,"Nic nie znaleziono");
+            }
+            getch();
+        }else{
+            wybor=atoi(input);
 
-        aktualny=getRoomPtrByNumber(wybor);
-        if(aktualny!=-1){
-            char znak;
-            char nazwisko[50];
-            int pozycja=0;
-            while(true){
-                clear();
-                noecho();
-                getmaxyx( stdscr, rzedy, kolumny );
-                mvprintw(rzedy-2,0,"Nawigacja strzalkami: lewo - wroc do pieter, prawo - edycja podswietlonego miejsca, gora/dol - zmiana miejsca");
-                x=0;
-                y=0;
-                wattrset(okno,COLOR_PAIR(6));
+            aktualny=getRoomPtrByNumber(wybor);
+            if(aktualny){
+                char znak;
+                char nazwisko[50];
+                int pozycja=0;
+                while(true){
+                    clear();
+                    noecho();
+                    getmaxyx( stdscr, rzedy, kolumny );
+                    mvprintw(rzedy-2,0,"Nawigacja strzalkami: lewo - wroc do pieter, prawo - edycja podswietlonego miejsca, gora/dol - zmiana miejsca");
+                    x=0;
+                    y=0;
+                    wattrset(okno,COLOR_PAIR(6));
 
-                mvprintw(0,0,"Kwatermistrz3000 - wygodne kwaterowanie na Rajdzie Elektryka\n");
+                    mvprintw(0,0,"Kwatermistrz3000 - wygodne kwaterowanie na Rajdzie Elektryka\n");
 
-                wattrset(okno,COLOR_PAIR(2));
-                y++;
-                x=0;
-                mvprintw(y,x,"Pokój numer %d zajete %d/%d miejsc", aktualny->getNumerPokoju(), aktualny->getLiczbaZajetychMiejsc(), aktualny->getLiczbaMiejsc());
-                for(int i=0;i<aktualny->getLiczbaMiejsc();i++){
+                    wattrset(okno,COLOR_PAIR(2));
                     y++;
                     x=0;
-                    if(i==pozycja){
-                        attron( A_REVERSE );
-                        mvprintw(y,x,"%d. %s",i+1, aktualny->getOsobaZPokoju(i)->getOsoba());
-                        attroff( A_REVERSE );
-                    }else{
-                        mvprintw(y,x,"%d. %s",i+1, aktualny->getOsobaZPokoju(i)->getOsoba());
+                    mvprintw(y,x,"Pokój numer %d zajete %d/%d miejsc", aktualny->getNumerPokoju(), aktualny->getLiczbaZajetychMiejsc(), aktualny->getLiczbaMiejsc());
+                    for(int i=0;i<aktualny->getLiczbaMiejsc();i++){
+                        y++;
+                        x=0;
+                        if(i==pozycja){
+                            attron( A_REVERSE );
+                            mvprintw(y,x,"%d. %s",i+1, aktualny->getOsobaZPokoju(i)->getOsoba());
+                            attroff( A_REVERSE );
+                        }else{
+                            mvprintw(y,x,"%d. %s",i+1, aktualny->getOsobaZPokoju(i)->getOsoba());
+                        }
                     }
-                }
 
-                znak=getch();
+                    znak=getch();
 
-                if (znak == '\033') { // if the first value is esc
-                    getch(); // skip the [
-                    switch(getch()) { // the real value
-                        case 'A' :  if(pozycja>0){
-                                        pozycja--;
-                                    }
-                                    break;
-                        case 'B':   if(pozycja<aktualny->getLiczbaMiejsc()-1){
-                                        pozycja++;
-                                    }
-                                    break;
-                        case 'C':   y=2+pozycja;
-                                    if(pozycja>8){
-                                        x=4;
-                                    }else{
-                                        x=3;
-                                    }
-                                    move(y,x);
-                                    printw("                                                  ");
-                                    move(y,x);
-                                    curs_set(1);
-                                    echo();
-                                    getstr(nazwisko);
-                                    curs_set(0);
-                                    aktualny->getOsobaZPokoju(pozycja)->setOsoba(nazwisko);
-                                    if(nazwisko[0]!='\0'){
-                                        aktualny->getOsobaZPokoju(pozycja)->setStan(true);
-                                    }
-                                    else{
-                                        aktualny->getOsobaZPokoju(pozycja)->setStan(false);
-                                    }
-                                    break;
-                        case 'D':   goto wyjscie;
-                                    break;
-                        default: break;
+                    if (znak == '\033') { // if the first value is esc
+                        getch(); // skip the [
+                        switch(getch()) { // the real value
+                            case 'A' :  if(pozycja>0){
+                                            pozycja--;
+                                        }
+                                        break;
+                            case 'B':   if(pozycja<aktualny->getLiczbaMiejsc()-1){
+                                            pozycja++;
+                                        }
+                                        break;
+                            case 'C':   y=2+pozycja;
+                                        if(pozycja>8){
+                                            x=4;
+                                        }else{
+                                            x=3;
+                                        }
+                                        move(y,x);
+                                        printw("                                                  ");
+                                        move(y,x);
+                                        curs_set(1);
+                                        echo();
+                                        getstr(nazwisko);
+                                        curs_set(0);
+                                        aktualny->getOsobaZPokoju(pozycja)->setOsoba(nazwisko);
+                                        if(nazwisko[0]!='\0'){
+                                            aktualny->getOsobaZPokoju(pozycja)->setStan(true);
+                                        }
+                                        else{
+                                            aktualny->getOsobaZPokoju(pozycja)->setStan(false);
+                                        }
+                                        break;
+                            case 'D':   goto wyjscie;
+                                        break;
+                            default: break;
+                        }
                     }
                 }
             }
+            wyjscie:
+            echo();
         }
-        wyjscie:
-        echo();
     }
     while(true);
 }
