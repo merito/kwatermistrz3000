@@ -3,7 +3,7 @@
 
 Osoba::Osoba(){
     this->stan=false;
-    this->nazwa=new char[20];
+    this->nazwa=new char[50];
 }
 
 Osoba::~Osoba(){
@@ -19,7 +19,7 @@ bool Osoba::getStan(){
 }
 
 void Osoba::setOsoba(char *nazwa){
-    memcpy(this->nazwa,nazwa,sizeof(char)*20);
+    memcpy(this->nazwa,nazwa,sizeof(char)*50);
 }
 
 void Osoba::setStan(bool stan){

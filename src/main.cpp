@@ -104,7 +104,7 @@ void oknoGlowne(int liczbaPieter, Pietro* pietra){
                 wattrset(okno,COLOR_PAIR(2));
                 x+=15;
             }
-            y++;
+            y++; y++;
             x=0;
         }
 
@@ -126,7 +126,7 @@ void oknoGlowne(int liczbaPieter, Pietro* pietra){
         aktualny=getRoomPtrByNumber(wybor);
         if(aktualny!=-1){
             char znak;
-            char nazwisko[20];
+            char nazwisko[50];
             int pozycja=0;
             while(true){
                 clear();
@@ -175,7 +175,7 @@ void oknoGlowne(int liczbaPieter, Pietro* pietra){
                                         x=3;
                                     }
                                     move(y,x);
-                                    printw("                     ");
+                                    printw("                                                  ");
                                     move(y,x);
                                     curs_set(1);
                                     echo();
@@ -253,13 +253,13 @@ int main()
                 pietra[i].setLiczbaPokoi(liczbaPokoi);
                 for(int j=0;j<liczbaPokoi;j++){
                     int numerPokoju, liczbaMiejsc;
-                    char nazwisko[22];
+                    char nazwisko[52];
                     fscanf(plik, "%d", &numerPokoju);
                     fscanf(plik, "%d", &liczbaMiejsc);
                     pietra[i].getPokoje()[j].setPokoj(numerPokoju, liczbaMiejsc);
                     fgets(nazwisko, 2, plik);
                     for(int k=0;k<liczbaMiejsc;k++){
-                        fgets(nazwisko, 22, plik);
+                        fgets(nazwisko, 52, plik);
                         char *lamanieLinii=NULL;
                         lamanieLinii=strchr(nazwisko,'\n');
                         if(*lamanieLinii){
