@@ -4,6 +4,10 @@ Pokoj::Pokoj(){
     this->zajetychMiejsc=0;
 }
 
+Pokoj::~Pokoj(){
+    delete[] osoby;
+}
+
 void Pokoj::setPokoj(int numer, int liczbaMiejsc)
 {
     this->numer=numer;

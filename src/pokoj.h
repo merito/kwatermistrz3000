@@ -7,6 +7,7 @@ class Pokoj
 {
 public:
     Pokoj();
+    ~Pokoj();
     void setPokoj(int numer, int liczbaMiejsc);
     Osoba* getOsobyZPokoju();
     Osoba* getOsobaZPokoju(int);

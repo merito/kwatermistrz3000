@@ -118,6 +118,7 @@ void oknoGlowne(int liczbaPieter, Pietro* pietra){
             zapiszBaze(pietra, liczbaPieter);
         }else
         if(!(strcmp(input,"koniec"))){
+            delete[] pietra;
             return;
         }
         wybor=atoi(input);
